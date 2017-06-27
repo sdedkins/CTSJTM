@@ -1,0 +1,62 @@
+function [ ] = bin_and_average_SM( obj_G,obj_map,bin_specifier,mode )
+%bin_and_average Bins spectra according to some metric (feature energy or 
+%strength)and averages the spectra from those bins
+%   Detailed explanation goes here
+
+% Extract dimensions of map array
+map_size=size(obj_G.map);
+
+% Find maximum and minmum values in classification array
+max_val=max(obj_map.map(:));
+min_val=min(obj_map.map(:));
+
+% Determine whether to automatiaclly create bins or use bins specified in
+% arguments
+if mode==1
+    bins=linspace(min_val,max_val,bin_specifier+1);
+elseif mode==2
+    bins=bin_specifier;
+    
+else
+    error('Unrecognised Operation Mode');
+    
+end
+    
+
+% sort pixels into pins and take their mean value. 
+
+for i=1:length(bins)-1
+    
+    bin_ind=obj_map.map >= bins(i) & obj_map.map <= bins(i+1);
+    mean_val(i)=nanmean(obj_G.map(bin_ind));
+    bin_centre(i)=(bins(i)+bins(i+1))/2;
+    
+end
+
+% plot mean value of obj_G.map for each bin
+
+figure1 = figure('Color',[1 1 1]);
+
+
+% Create axes
+axes1 = axes('Parent',figure1,'XTickLabel',{'0','\pi','2\pi'},...
+    'XTick',[0 3.14159 6.283],...
+    'FontSize',16);
+%% Uncomment the following line to preserve the X-limits of the axes
+% xlim(axes1,[0 6.28318530717959]);
+box(axes1,'on');
+hold(axes1,'on');
+
+% Create ylabel
+ylabel('T/ Tmax');
+
+% Create xlabel
+xlabel('\phi');
+
+% Create plot
+plot(bin_centre,mean_val./max(mean_val),'MarkerFaceColor',[0 0 0],'Marker','o','LineStyle','none',...
+    'Color',[0 0 0]);
+axis square
+xlim([0 2*pi])
+
+end
